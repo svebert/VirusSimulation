@@ -17,8 +17,8 @@ class Person:
         self.next_position = np.array([np.random.rand()*2, np.random.rand()*2])
         self.speed = 0.03
         self.color = 'b'
-        self.get_infection = 1#np.random.normal(0.5, 0.1)
-        self.give_infection = 1#np.random.normal(0.5, 0.1)
+        self.get_infection = np.random.normal(0.5, 0.2)
+        self.give_infection = np.random.normal(0.5, 0.2)
 
     def move(self):
         vec = (self.next_position - self.position)
@@ -53,7 +53,7 @@ class Person:
 
 
 class People:
-    def __init__(self, n_people=500, work=False):
+    def __init__(self, n_people=500, work=True):
         self.persons = [Person() for i in range(n_people)]
         self.persons[0].infectious_counter = 10
         if work:
@@ -61,8 +61,9 @@ class People:
             #home_positions = [np.array([np.random.rand(), np.random.rand()]) for i in range(10)]
             n_per_position = int(len(self.persons)/len(work_positions))
             for i in range(len(self.persons)):
-                self.persons[i].positions.append(np.array([np.random.rand()*2, np.random.rand()*2]))
                 self.persons[i].positions.append(work_positions[int(i / n_per_position)])
+                self.persons[i].positions.append(np.array([np.random.rand()*2, np.random.rand()*2]))
+
                 self.persons[i].group = int(i / n_per_position)
                 self.persons[i].next_positions_idx = 0
                 self.persons[i].position = np.array([self.persons[i].positions[0][0], self.persons[i].positions[0][1]])
@@ -78,11 +79,12 @@ class People:
             if p1.infectious_counter == 0 or p1.quarantine_counter > 0:
                 continue
             if p1.symptom_counter > symptome_time:
-                p1.quarantine_counter = int(symptome_time*1.25)
+                if np.random.rand() < 0.8:
+                    p1.quarantine_counter = int(symptome_time*1.25)
                 if p1.group is not None:
                     #quarantine for all of same group
                     for p in self.persons:
-                        if p.group == p1.group:
+                        if p.group == p1.group and np.random.rand() < 0.8:
                             p.quarantine_counter = int(symptome_time*1.25)
                 continue
 
